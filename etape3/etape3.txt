@@ -1,0 +1,59 @@
+Etape 3:
+
+debCal = début calendrier
+finCal = fin calendrier
+debEvt = début événement
+finEvt = fin événement
+introHDebEvtU = intro heure début evt unique
+introHFinEvtU = intro heure fin evt unique
+dateHEvtU = date et heure evt unique
+introTitre = intro titre
+introLieu = intro lieu
+introDesc = intro description
+titreLieuDesc = titre/lieu/description
+
+debAla = début alarme
+finAla = fin alarme
+introPosAla = intro position alarme
+posAla = position alarme
+introHDebEvtRep = intro heure début evt répétitif
+introHFinEvtRep = intro heure fin evt répétitif
+dateHEvtRep = date et heure evt répétitif
+introRegRep = intro règle répétition
+introFreq = intro fréquence
+introCpt =intro compteur
+introLstJ = intro liste jours
+
+introLimit = intro limite
+limite = limite
+freq = fréquence
+nbEnt = nombre entier
+listJour = liste jours
+semaine = changement de semaine
+option = séparateur d’options
+introHDebEvtJ = intro heure début evt journée
+introHFinEvtJ = intro heure fin evt journée
+dateEvtJ = date evt journée
+
+_____________
+
+
+Axiome = S
+
+S -> debCal CorpsCal finCal 
+
+CorpsCal -> debEvt CorpsEvt finEvt corpsCal | λ
+
+CorpsEvt -> CorpsEvtU CorpsCal | CorpsEvtRep CorpsCal | CorpsEvtJ CorpsCal | λ
+
+CorpsEvtU -> introHDebEvtU dateHEvtU introHFinEvtU dateHEvtU TLD declaAlarme
+
+TLD -> introTitre titreLieuDesc introLieu titreLieuDesc introDesc titreLieuDesc 
+
+DeclaAlarme -> debAla introPosAla posAla finAla DeclaAlarme | λ
+
+CorpsEvtRep -> evtRepDebut introLimit limite TLD DeclaAlarme | evtRepDebut semaine listJour option introCpt nbEnt option introLstJ listJour TLD DeclaAlarme
+
+EvtRepDebut -> introHDebEvtRep dateHEvtRep introHFinEvtRep dateHEvtRep introRegRep freq option
+
+CorpsEvtJ -> introHDebEvtJ dateEvtJ introHFinEvtJ dateEvtJ TLD declaArlarme
