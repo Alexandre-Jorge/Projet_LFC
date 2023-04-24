@@ -13,6 +13,11 @@
     #define FRQC -8
     #define CPT -9
     #define LSTJ -10
+    #define DEBUT -11
+    #define FIN -12
+    #define DESCR -13
+    #define LIEU -14
+    #define TITRE -15
 
     matrix table1;
     char * table2;
@@ -82,6 +87,21 @@
                     case LSTJ :
                         printf("LSTJ\t");
                         break;
+                    case DEBUT :
+                        printf("DEBUT\t");
+                        break;
+                    case FIN :
+                        printf("FIN\t");
+                        break;
+                    case DESCR :    
+                        printf("DESCR\t");
+                        break;
+                    case LIEU :
+                        printf("LIEU\t");
+                        break;
+                    case TITRE :
+                        printf("TITRE\t");
+                        break;
                     default : 
                         printf("%d\t", table1[i][j]);
                 }
@@ -108,11 +128,11 @@ BEGIN:VCALENDAR	                                                {printf("Début 
 END:VCALENDAR	                                                {printf("Fin calendrier\n");return FINCAL;}
 BEGIN:VEVENT	                                                {printf("Début événement\n"); BEGIN LIGNEOK;return DEBEVT;}
 END:VEVENT	                                                    {printf("Fin événement\n");return FINEVT;}
-<LIGNEOK>DTSTART:	                                            {printf("intro heure début evt unique\n"); BEGIN DATEUOK;addEVT(UNIQ);return IDEBEVTU;}
-<LIGNEOK>DTEND:		                                            {printf("intro heure fin evt unique\n"); BEGIN DATEUOK;return IFINEVTU;}
-<LIGNEOK>SUMMARY:	                                            {printf("intro titre\n"); BEGIN TEXTOK;return ITITRE;}
-<LIGNEOK>LOCATION:	                                            {printf("intro lieu\n"); BEGIN TEXTOK;return ILIEU;}
-<LIGNEOK>DESCRIPTION:	                                        {printf("intro description\n"); BEGIN TEXTOK;return IDESCR;}
+<LIGNEOK>DTSTART:	                                            {printf("intro heure début evt unique\n"); BEGIN DATEUOK;addEVT(UNIQ);yylval=line;return IDEBEVTU;}
+<LIGNEOK>DTEND:		                                            {printf("intro heure fin evt unique\n"); BEGIN DATEUOK;yylval=line;return IFINEVTU;}
+<LIGNEOK>SUMMARY:	                                            {printf("intro titre\n"); BEGIN TEXTOK;yylval=line;return ITITRE;}
+<LIGNEOK>LOCATION:	                                            {printf("intro lieu\n"); BEGIN TEXTOK;yylval=line;return ILIEU;}
+<LIGNEOK>DESCRIPTION:	                                        {printf("intro description\n"); BEGIN TEXTOK;yylval=line;return IDESCR;}
 <LIGNEOK>BEGIN:VALARM	                                        {printf("Début alarme\n"); BEGIN ALARMOK;return DEBAL;}
 <ALARMOK>END:VALARM	                                            {printf("Fin alarme\n"); BEGIN LIGNEOK;return FINAL;}
 <ALARMOK>TRIGGER:	                                            {printf("intro position alarme\n");return TRIGGER;}
@@ -124,10 +144,10 @@ END:VEVENT	                                                    {printf("Fin év�
 <LIGNEOK>WKST=SU		                                        {printf("changement de semaine\n");return WKST;}
 <LIGNEOK>DAILY|WEEKLY|MONTHLY|YEARLY	                        {printf("frequence : %s\n", yytext);addTable(FRQC, yytext, (int)strlen(yytext));return VALFREQ;}
 <LIGNEOK>;		                                                {printf("séparateur options\n");return PV;}
-<LIGNEOK>DTSTART;TZID=[a-zA-Z/]+:	                            {printf("intro heure début evt répétitif\n");BEGIN DATEROK;addEVT(REPET);return DEBEVTR;}
-<LIGNEOK>DTEND;TZID=[a-zA-Z/]+:		                            {printf("intro heure fin evt répétitif\n");BEGIN DATEROK;return FINEVTR;}
-<LIGNEOK>DTSTART;VALUE=DATE:	                                {printf("intro heure début evt journée\n");BEGIN DATEJOK;addEVT(JOUR);return DEBEVTJ;}
-<LIGNEOK>DTEND;VALUE=DATE:		                                {printf("intro heure fin evt journée\n"); BEGIN DATEJOK;return FINEVTJ;}
+<LIGNEOK>DTSTART;TZID=[a-zA-Z/]+:	                            {printf("intro heure début evt répétitif\n");BEGIN DATEROK;addEVT(REPET);yylval=line;return DEBEVTR;}
+<LIGNEOK>DTEND;TZID=[a-zA-Z/]+:		                            {printf("intro heure fin evt répétitif\n");BEGIN DATEROK;yylval=line;return FINEVTR;}
+<LIGNEOK>DTSTART;VALUE=DATE:	                                {printf("intro heure début evt journée\n");BEGIN DATEJOK;addEVT(JOUR);yylval=line;return DEBEVTJ;}
+<LIGNEOK>DTEND;VALUE=DATE:		                                {printf("intro heure fin evt journée\n"); BEGIN DATEJOK;yylval=line;return FINEVTJ;}
 <ALARMOK>"-P"[0-9]+DT[0-9]+H[0-9]+M[0-9]+S	                    {printf("position alarme : %s\n", yytext);addTable(ALARM, yytext, (int)strlen(yytext));return POSAL;}
 <DATEJOK>[0-9]{8}	                                            {printf("date evt journée : %s\n", yytext);BEGIN LIGNEOK;addTable(DAT, yytext, (int)strlen(yytext));return DATEVTJ;}
 <NBOK>[0-9]+		                                            {printf("nombre entier : %s\n", yytext);BEGIN LIGNEOK;addTable(CPT, yytext, (int)strlen(yytext));return NOMBRE;}
