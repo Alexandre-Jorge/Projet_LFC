@@ -44,7 +44,7 @@ int main()
 	yyparse();
 	displayTab();
 	printf("\nFin des analyses lexicale et syntaxique\n");
-	printf("%s\n", table2+89);
+	toHTML();
 	for (int i = 0; i < 1000; i++) {
         free(table1[i]);
     }

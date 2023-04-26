@@ -111,6 +111,292 @@
         
         printf("\n%s\n", table2);
     }
+    void toDate_heure(char * date_heure){
+        char * aaaa = malloc(sizeof(char)*4);
+        char * mm = malloc(sizeof(char)*2);
+        char * jj = malloc(sizeof(char)*2);
+        char * hh = malloc(sizeof(char)*2);
+        char * mn = malloc(sizeof(char)*2);
+        char * ss = malloc(sizeof(char)*2);
+        for(int i = 0; i < 4; i++){
+            aaaa[i] = date_heure[i];
+        }
+        for(int i = 0; i < 2; i++){
+            mm[i] = date_heure[i+4];
+            jj[i] = date_heure[i+6];
+            hh[i] = date_heure[i+9];
+            mn[i] = date_heure[i+11];
+            ss[i] = date_heure[i+13];
+        }
+        strcpy(date_heure, aaaa);
+        strcat(date_heure, "/");
+        strcat(date_heure, mm);
+        strcat(date_heure, "/");
+        strcat(date_heure, jj);
+        strcat(date_heure, " ");
+        strcat(date_heure, hh);
+        strcat(date_heure, ":");
+        strcat(date_heure, mn);
+        strcat(date_heure, ":");
+        strcat(date_heure, ss);
+    }
+    void toDate(char * date_heure){
+        char * aaaa = malloc(sizeof(char)*4);
+        char * mm = malloc(sizeof(char)*2);
+        char * jj = malloc(sizeof(char)*2);
+        for(int i = 0; i < 4; i++){
+            aaaa[i] = date_heure[i];
+        }
+        for(int i = 0; i < 2; i++){
+            mm[i] = date_heure[i+4];
+            jj[i] = date_heure[i+6];
+        }
+        strcpy(date_heure, aaaa);
+        strcat(date_heure, "/");
+        strcat(date_heure, mm);
+        strcat(date_heure, "/");
+        strcat(date_heure, jj);
+    }
+
+    void toFreq(char * freq){
+        switch(freq[0]){
+            case 'D':
+                strcpy(freq, "jour");
+                break;
+            case 'W':
+                strcpy(freq, "semaine");
+                break;
+            case 'M':
+                strcpy(freq, "mois");
+                break;
+            case 'Y':
+                strcpy(freq, "année");
+                break;
+        }
+    }
+    void toList_jours(char * list_jours){
+        char * res = malloc(sizeof(char)*100);
+        for(int i=0; i<strlen(list_jours); i+=3){
+            switch(list_jours[i]){
+                case 'S' :
+                    if(list_jours[i+1] == 'U'){
+                        strcat(res, "dimanche ");
+                    }
+                    else if(list_jours[i+1] == 'A'){
+                        strcat(res, "samedi ");
+                    }
+                    break;
+                case 'M' :
+                    strcat(res, "lundi ");
+                    break;
+                case 'T' :
+                    if(list_jours[i+1] == 'U'){
+                        strcat(res, "mardi ");
+                    }
+                    else if(list_jours[i+1] == 'H'){
+                        strcat(res, "jeudi ");
+                    }
+                    break;
+                case 'W' :
+                    strcat(res, "mercredi ");
+                    break;
+                case 'F' :
+                    strcat(res, "vendredi ");
+                    break;
+            }
+        }
+        strcpy(list_jours, res);
+    }
+
+    void toHTML(){
+        int nbEvtUniq = 0;
+        int nbEvtRepet = 0;
+        int nbEvtJour = 0;
+        FILE *fichier = fopen("etape5.html", "w");
+        fprintf(fichier, "<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"utf-8\" />\n<title>Etape 5</title>\n</head>\n<body>\n");
+        for(int i=0;i<line;i++){
+            if(table1[i][0] == EVT){
+                int j = 1;
+                int nbAlarmes = 0;
+                int date_et_heure_limite_bool = 0;
+                char * date_et_heure_debut = malloc(sizeof(char)*16);
+                char * date_et_heure_fin = malloc(sizeof(char)*16);
+                char * titre = malloc(sizeof(char)*240);
+                char * lieu = malloc(sizeof(char)*240);
+                char * description = malloc(sizeof(char)*240);
+                char * frequence = malloc(sizeof(char)*10);
+                char * liste_jours = malloc(sizeof(char)*100);
+                char * nombre_de_fois = malloc(sizeof(char)*10);
+                char * date_et_heure_limite = malloc(sizeof(char)*16);
+                char ** alarmes = malloc(sizeof(char*)*10);
+                for(int k = 0; k < 10; k++){
+                    alarmes[k] = malloc(sizeof(char)*16);
+                }
+                while(table1[i+j][2] == i){
+                    if(table1[i+j][0] == DAT){
+                        if(table1[i+j][1] == DEBUT){
+                            date_et_heure_debut[0] = '\0';
+                            for(int k = 0; k < table1[i+j][4]; k++){
+                                date_et_heure_debut[k] = table2[table1[i+j][3]+k];
+                            }
+                            date_et_heure_debut[table1[i+j][4]] = '\0';
+                        }
+                        else if(table1[i+j][1] == FIN){
+                            date_et_heure_fin[0] = '\0';
+                            for(int k = 0; k < table1[i+j][4]; k++){
+                                date_et_heure_fin[k] = table2[table1[i+j][3]+k];
+                            }
+                            date_et_heure_fin[table1[i+j][4]] = '\0';
+                        }
+                        else if(table1[i+j][1] == 0){
+                            date_et_heure_limite[0] = '\0';
+                            date_et_heure_limite_bool = 1;
+                            for(int k = 0; k < table1[i+j][4]; k++){
+                                date_et_heure_limite[k] = table2[table1[i+j][3]+k];
+                            }
+                            date_et_heure_limite[table1[i+j][4]] = '\0';
+                        }
+                    }
+                    else if(table1[i+j][0] == TXT){
+                        if(table1[i+j][1] == TITRE){
+                            titre[0] = '\0';
+                            for(int k = 0; k < table1[i+j][4]; k++){
+                                titre[k] = table2[table1[i+j][3]+k];
+                            }
+                            titre[table1[i+j][4]] = '\0';
+                        }
+                        else if(table1[i+j][1] == LIEU){
+                            lieu[0] = '\0';
+                            for(int k = 0; k < table1[i+j][4]; k++){
+                                lieu[k] = table2[table1[i+j][3]+k];
+                            }
+                            lieu[table1[i+j][4]] = '\0';
+                        }
+                        else if(table1[i+j][1] == DESCR){
+                            description[0] = '\0';
+                            for(int k = 0; k < table1[i+j][4]; k++){
+                                description[k] = table2[table1[i+j][3]+k];
+                            }
+                            description[table1[i+j][4]] = '\0';
+                        }
+                    }
+                    else if(table1[i+j][0] == FRQC){
+                        frequence[0] = '\0';
+                        for(int k = 0; k < table1[i+j][4]; k++){
+                            frequence[k] = table2[table1[i+j][3]+k];
+                        }
+                        frequence[table1[i+j][4]] = '\0';
+                    }
+                    else if(table1[i+j][0] == CPT){
+                        nombre_de_fois[0] = '\0';
+                        for(int k = 0; k < table1[i+j][4]; k++){
+                            nombre_de_fois[k] = table2[table1[i+j][3]+k];
+                        }
+                        nombre_de_fois[table1[i+j][4]] = '\0';
+                    }
+                    else if(table1[i+j][0] == LSTJ){
+                        liste_jours[0] = '\0';
+                        for(int k = 0; k < table1[i+j][4]; k++){
+                            liste_jours[k] = table2[table1[i+j][3]+k];
+                        }
+                        liste_jours[table1[i+j][4]] = '\0';
+                    }
+                    else if(table1[i+j][0] == ALARM){
+                        alarmes[nbAlarmes][0] = '\0';
+                        for(int k = 0; k < table1[i+j][4]; k++){
+                            alarmes[nbAlarmes][k] = table2[table1[i+j][3]+k];
+                        }
+                        alarmes[nbAlarmes][table1[i+j][4]] = '\0';
+                        nbAlarmes++;
+                    }
+                    j++;
+                }
+                switch(table1[i][1]){
+                    case UNIQ :
+                        nbEvtUniq++;
+                        toDate_heure(date_et_heure_debut);
+                        toDate_heure(date_et_heure_fin);
+                        fprintf(fichier, "<div style=\"color: black;\">\n");
+                        fprintf(fichier, "<h1>Du %s au %s</h1>\n", date_et_heure_debut, date_et_heure_fin);
+                        break;
+                    case REPET :
+                        nbEvtRepet++;
+                        toDate_heure(date_et_heure_debut);
+                        toDate_heure(date_et_heure_fin);
+                        fprintf(fichier, "<div style=\"color: green;\">\n");
+                        fprintf(fichier, "<h1>Du %s au %s</h1>\n", date_et_heure_debut, date_et_heure_fin);
+                        break;
+                    case JOUR :
+                        nbEvtJour++;
+                        toDate(date_et_heure_debut);
+                        fprintf(fichier, "<div style=\"color: red;\">\n");
+                        fprintf(fichier, "<h1>Le %s, toute la journée</h1>\n", date_et_heure_debut);
+                        break;
+                }
+                if(strlen(titre) > 0){
+                    fprintf(fichier, "<h2>%s</h2>\n", titre);
+                }
+                else {
+                    fprintf(fichier, "<h2>Sans titre</h2>\n");
+                }
+                if(strlen(lieu) > 0){
+                    fprintf(fichier, "<p>%s</p>\n", lieu);
+                }
+                else {
+                    fprintf(fichier, "<p>Pas de lieu</p>\n");
+                }
+                if(strlen(description) > 0){
+                    fprintf(fichier, "<p>%s</p>\n", description);
+                }
+                else {
+                    fprintf(fichier, "<p>Pas de description</p>\n");
+                }
+                if(table1[i][1] == REPET){
+                    toFreq(frequence);
+                    fprintf(fichier, "<p>Doit se répéter chaque %s, ", frequence);
+                    if(date_et_heure_limite_bool){
+                        toDate_heure(date_et_heure_limite);
+                        fprintf(fichier, "jusqu'au %s</p>\n", date_et_heure_limite);
+                    }
+                    else {
+                        toList_jours(liste_jours);
+                        fprintf(fichier, "les %s, %s fois</p>\n", liste_jours, nombre_de_fois);
+                    }
+                }
+                if(nbAlarmes > 0){
+                    fprintf(fichier, "<p>Alarmes définies : %s", alarmes[0]+5);
+                    for(int k = 1; k < nbAlarmes; k++){
+                        fprintf(fichier, ", %s", alarmes[k]+5);
+                    }
+                    fprintf(fichier, "</p>\n");
+                }
+                fprintf(fichier, "</div>\n");
+                fprintf(fichier, "<br/>\n");
+                free(date_et_heure_debut);
+                free(date_et_heure_fin);
+                free(date_et_heure_limite);
+                free(titre);
+                free(lieu);
+                free(description);
+                free(frequence);
+                free(nombre_de_fois);
+                free(liste_jours);
+                for(int k = 0; k < 10; k++){
+                    free(alarmes[k]);
+                }
+                free(alarmes);
+            }
+        }
+        fprintf(fichier, "<p>%d événements au total dont :</p>\n", nbEvtUniq+nbEvtRepet+nbEvtJour);
+        fprintf(fichier, "<ul>\n");
+        fprintf(fichier, "<li>%d événements uniques</li>\n", nbEvtUniq);
+        fprintf(fichier, "<li>%d événements répétitifs</li>\n", nbEvtRepet);
+        fprintf(fichier, "<li>%d événements à la journée</li>\n", nbEvtJour);
+        fprintf(fichier, "</ul>\n");
+        fprintf(fichier, "</body>\n");
+        fprintf(fichier, "</html>\n");
+        fclose(fichier);
+    }
 %}
 
 %start LIGNEOK
